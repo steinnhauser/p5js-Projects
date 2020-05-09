@@ -12,7 +12,10 @@ var boundsCheckbox = false;     // Dictates whether or not the boundaries of the
 
 var massSlider;       // Slider used to create masses
 var GUISet = false;   // Helps set up the GUI on the first draw
-var paragraph;
+var paragraph;        // Helps remove GUI when exiting to main screen.
+
+var tempX, tempY;     // Helps save the mouse cursor placement for planet creation
+var newPlanet = null; // Allow the newPlanet object to be accessed globally
 
 function setup() {
   // put setup code here
@@ -54,6 +57,12 @@ function draw() {
     updatePlanets();
 
     drawPlanets();
+
+    // Draw the trajectory line
+    if (mouseIsPressed) {
+      stroke(255);
+      line(tempX, tempY, mouseX, mouseY);
+    }
 
   }
 }
@@ -152,8 +161,29 @@ function mousePressed() {
     }
   } else {
     // Otherwise, ingame, the mouse should share similar functionality.
-    planets[noPlanets] = new Planet(mouseX, mouseY);
+    tempX = mouseX;
+    tempY = mouseY;
+    newPlanet = new Planet(mouseX, mouseY);
+
+    // Not move this planet until the cursor is released
+    newPlanet.mov = false;
+
+    planets[noPlanets] = newPlanet;
     noPlanets++;
+    
+  }
+}
+
+function mouseReleased() {
+  /* Release the newPlanet object and give it the velocity according to the difference
+   * between the parameters mouseX, mouseY and tempX, tempY */
+
+  if (newPlanet == null) {
+    // Avoid registering in the first release after main menu
+  } else {
+    newPlanet.velX = (tempX - mouseX)/100;
+    newPlanet.velY = (tempY - mouseY)/100;
+    newPlanet.mov = true;
   }
 }
 
@@ -181,7 +211,6 @@ function drawPlanets() {
   for (var i = 0; i < planets.length; i++) {
     ellipse(planets[i].posX, planets[i].posY, planets[i].mass, planets[i].mass);
   }
-
 }
 
 function updatePlanets() {
