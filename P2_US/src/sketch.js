@@ -59,7 +59,7 @@ function draw() {
     drawPlanets();
 
     // Draw the trajectory line
-    if (mouseIsPressed) {
+    if (mouseIsPressed && newPlanet) {
       stroke(255);
       line(tempX, tempY, mouseX, mouseY);
     }
@@ -193,6 +193,7 @@ function keyPressed() {
     mode = 0;
     starsSet = false;
     GUISet = false;
+    newPlanet = null;
 
     // remove the set GUI
     paragraph.remove();
